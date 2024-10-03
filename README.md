@@ -54,16 +54,101 @@ grep -c "CDS" output.gff
 3594
 ```
 ## Question 3: 
+### Running Prodigal on Multiple Genomes
+### Unzip the Genomes File
+```bash
+unzip NCBI_dataset.zip -d genomes/
+```
+This extracted the genomes into a directory named genomes/.
+### Output
+```bash
+@hernanym ➜ /workspaces/Week-5 (main) $ unzip NCBI_dataset.zip -d genomes/
+Archive:  NCBI_dataset.zip
+   creating: genomes/NCBI_dataset/
+  inflating: genomes/NCBI_dataset/GCA_000006745.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000006825.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000006865.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000007125.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008525.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008545.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008565.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008605.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008625.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008725.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008745.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000008785.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000027305.1.fna  
+  inflating: genomes/NCBI_dataset/GCA_000091085.2.fna 
+```
+Files have been successfully extracted. Now, you can proceed with running Prodigal on these genome files and counting the genes.
 
+### Script
+''' bash 
+genome_dir="genomes/NCBI_dataset/"
+output_dir="prodigal_outputs/"
 
-## Code Breakdown 
-### 1a. Take command line parameters for a FASTA file containing a genome 
-```python
+#Create a directory to store Prodigal outputs
+mkdir -p $output_dir
+
+ #Loop through all genome files in the directory
+for genome in $genome_dir/*.fna; do
+    # Get the base name of the genome file (without the directory and extension)
+    base_name=$(basename "$genome" .fna)
+    
+    # Run Prodigal on the genome file
+    prodigal -i "$genome" -o "$output_dir/${base_name}.gff" -f gff
+    
+    # Count the number of CDS (genes) in the GFF file
+    num_genes=$(grep -c "CDS" "$output_dir/${base_name}.gff")
+    
+    # Print the genome file and the gene count
+    echo "$base_name: $num_genes"
+done
 '''
-LLM: ChatGPT (Python) 4o
-
-Prompt: 
-How do I write a python code that takes command-line parameters for an input file? 
-The input file will consist of a FASTA file containing a genome.
-
+### Run Script 
+'''bash 
+@hernanym ➜ /workspaces/Week-5 (main) $ genome_dir="genomes/NCBI_dataset/"
+@hernanym ➜ /workspaces/Week-5 (main) $ output_dir="prodigal_outputs/"
+@hernanym ➜ /workspaces/Week-5 (main) $ mkdir -p $output_dir
+@hernanym ➜ /workspaces/Week-5 (main) $ for genome in $genome_dir/*.fna; do
+> base_name=$(basename "$genome" .fna)
+> prodigal -i "$genome" -o "$output_dir/${base_name}.gff" -f gff
+> num_genes=$(grep -c "CDS" "$output_dir/${base_name}.gff")
+> echo "$base_name: $num_genes"
+> done
 '''
+### Output 
+'''
+GCA_000006745.1: 3594
+GCA_000006825.1: 2032
+GCA_000006865.1: 2383
+GCA_000007125.1: 3152
+GCA_000008525.1: 1579
+GCA_000008545.1: 1866
+GCA_000008565.1: 3248
+GCA_000008605.1: 1009
+GCA_000008625.1: 1776
+GCA_000008725.1: 897
+GCA_000008745.1: 1063
+GCA_000008785.1: 1505
+GCA_000027305.1: 1748
+GCA_000091085.2: 1063
+'''
+### Genome with Highest Number of Genes: 
+```
+GCA_000006745.1, with 3,594 genes.
+```
+### Save Gene Counts to a File Using Bash
+```bash
+for genome in $genome_dir/*.fna; do
+    base_name=$(basename "$genome" .fna)
+    prodigal -i "$genome" -o "$output_dir/${base_name}.gff" -f gff
+    num_genes=$(grep -c "CDS" "$output_dir/${base_name}.gff")
+    echo "$base_name: $num_genes"
+done > genome_gene_counts.txt
+```
+The > genome_gene_counts.txt part at the end of the loop redirects all the output into a file named genome_gene_counts.txt.
+### You can check the contents of the file by running:
+```bash
+cat genome_gene_counts.txt
+```
