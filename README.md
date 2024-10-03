@@ -61,7 +61,7 @@ unzip NCBI_dataset.zip -d genomes/
 ```
 This extracted the genomes into a directory named genomes/.
 ### Output
-```bash
+```
 @hernanym ➜ /workspaces/Week-5 (main) $ unzip NCBI_dataset.zip -d genomes/
 Archive:  NCBI_dataset.zip
    creating: genomes/NCBI_dataset/
